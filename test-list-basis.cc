@@ -195,17 +195,133 @@ void PrintReverseKnode(Node *list, int k){
     std::cout << "the reverse "<< k << "th node: " << pre->val << std::endl;
 }
 
-int main(){
-    Node *list = nullptr;
+void ReverseList(Node **list){
+    if(list == nullptr || *list == nullptr || (*list)->next == nullptr){
+        return;
+    }
 
+    Node *pre, *cur, *next;
+    pre = *list;
+    cur = (*list)->next;
+    next = cur->next;
+    pre->next = nullptr;
+    do{
+        cur->next = pre;
+        if(next==nullptr){
+            break;
+        }
+      
+        pre = cur;
+        cur = next;
+        next = next->next;
+    }while(true);
+
+    *list = cur;
+}
+
+void MergeTwoSortedLists(Node **list1, Node **list2){
+    if( (list1 == nullptr && list2==nullptr) || 
+            ((*list1)==nullptr && (*list2)==nullptr)){
+        std::cout << "empty lists" << std::endl;
+        return ;
+    }
+
+    if( (*list1)==nullptr || (*list2)==nullptr){
+        (*list1) = (*list1)==nullptr? (*list2):(*list1);
+        return;
+    }
+
+    Node *p1 = (*list1)->val > (*list2)->val? (*list2):(*list1);
+    Node *p2 = (*list1)->val > (*list2)->val? (*list1):(*list2);
+    Node *next2;
+    while(p1!=nullptr && p2!=nullptr){ 
+        if(p1->next == nullptr){
+            p1->next = p2;
+            break;
+        }else if( p1->val < p2->val && p2->val<p1->next->val){
+            next2 = p2->next; 
+            p2->next = p1->next;
+            p1->next = p2;
+            p1 = p2;
+            p2 = next2;
+        }else{
+            p1 = p1->next;
+        }
+    };
+    
+    *list1 = (*list1)->val > (*list2)->val?(*list2):(*list1); // 递增链表，较小的为新的链表头
+}
+
+Node* MergeTwoSortedListsRecursively(Node *list1, Node *list2){
+    if(list1 == nullptr){
+        return list2;
+    }
+    if(list2 == nullptr){
+        return list1;
+    }
+
+    Node *p = nullptr;
+    if(list1->val < list2->val){
+        p = list1;
+        p->next = MergeTwoSortedListsRecursively(p->next, list2);
+    }else{
+        p = list2;
+        p->next = MergeTwoSortedListsRecursively(list1, p->next);
+    }
+
+    return p;
+}
+
+void MergeTwoSortedListsRecursivelyTest(){
+    Node *list1 = nullptr;
+    Node *list2 = nullptr;
+
+  //  AddToTail(&list1, 1);
+    AddToTail(&list1, 10);
+//    AddToTail(&list1, 13);
+
+    AddToTail(&list2, 10);
+    AddToTail(&list2, 10);
+    //AddToTail(&list2, 80);
+
+    list1 = MergeTwoSortedListsRecursively(list1, list2);
+    PrintList(list1);
+    DestroyList(&list1);
+}
+
+void MergeTwoSortedListsTest(){
+    Node *list1 = nullptr;
+    Node *list2 = nullptr;
+
+  //  AddToTail(&list1, 1);
+    AddToTail(&list1, 10);
+//    AddToTail(&list1, 13);
+
+    AddToTail(&list2, 10);
+    AddToTail(&list2, 10);
+    AddToTail(&list2, 80);
+
+    MergeTwoSortedLists(&list1, &list2);
+    PrintList(list1);
+    DestroyList(&list1);
+}
+
+void ReverseListTest(){
+    Node *list = nullptr;
     AddToTail(&list, 10);
     AddToTail(&list, 0);
     AddToTail(&list, 1);
-    //PrintListReverselyUsingStack(list);
-    PrintReverseKnode(list, 2);
-    // PrintList(list);
-    // RemoveNode(&list, 0);
-
+    PrintList(list);
+    ReverseList(&list);
+    PrintList(list);
     DestroyList(&list);
+}
+
+int main(){
+
+    //PrintListReverselyUsingStack(list);
+    //PrintReverseKnode(list, 2);
+    // RemoveNode(&list, 0);
+    MergeTwoSortedListsRecursivelyTest();
     return 0;
 }
