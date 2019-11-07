@@ -9,9 +9,9 @@ typedef struct Node{
 
     Node(int v){
         val = v;
+        left = right = nullptr;
     }
 }Node, *NodePtr;
-
 
 NodePtr CreateTree(){
     int data;
@@ -51,28 +51,6 @@ void PreOrder(NodePtr tree){
     PreOrder(tree->right);
 }
 
-void PreOrderRecursive(NodePtr tree){
-    if(tree == nullptr){
-        return;
-    }
-
-    std::stack<NodePtr> s;
-    s.push(tree);
-    NodePtr p;
-    do{
-       p = s.top();
-       std::cout << p->val << "  " ;
-       s.pop();
-       if( p->right != nullptr){
-            s.push(p->right);
-       }
-       if(p->left != nullptr){
-            s.push(p->left);
-       }
-
-    }while(!s.empty());
-}
-
 void InOrder(NodePtr tree){
     if(tree == nullptr){
         return;
@@ -91,6 +69,68 @@ void PostOrder(NodePtr tree){
     std::cout << tree->val << "  ";
 }
 
+void PreOrderRecursive(NodePtr tree){
+    std::stack<NodePtr> s;
+    NodePtr p = tree;
+    while( p !=nullptr || !s.empty()){
+        while(p !=nullptr){
+            std::cout << p->val << "  ";
+            s.push(p);
+            p = p->left;
+        }
+        if( !s.empty() ){
+            p = s.top();
+            s.pop();
+            p = p->right;
+        }
+    }
+}
+
+void InOrderRecursive(NodePtr tree){
+    std::stack<NodePtr> tstack;
+    NodePtr cur = tree;
+    while( cur != nullptr || !tstack.empty() ){
+        while(cur != nullptr){
+            tstack.push(cur);
+            cur = cur->left;
+        }
+
+        if( !tstack.empty() ){
+            cur = tstack.top();
+            std::cout << cur->val <<"  ";
+            tstack.pop();
+            cur = cur->right;
+        }
+    }
+}
+
+void PostOrderRecursive(NodePtr tree){
+    if(tree == nullptr){
+        return;
+    }
+
+    std::stack<NodePtr> tstack;
+    NodePtr cur = tree, pre = nullptr;
+    tstack.push(tree);
+    while(!tstack.empty()){
+        cur = tstack.top();
+        if( (cur->left ==nullptr && cur->right==nullptr) ||
+                (pre!=nullptr && (cur->left == pre || cur->right == pre))){
+            std::cout << cur->val << "  ";
+            tstack.pop();
+            pre = cur;
+        }else{
+            if(cur->right){
+                tstack.push(cur->right);
+            }
+
+            if(cur->left){
+                tstack.push(cur->left);
+            }
+        }
+    }
+}
+
 NodePtr FindPreNode(NodePtr tree){
     if(tree == nullptr){
         return nullptr;
@@ -105,10 +145,6 @@ NodePtr FindPreNode(NodePtr tree){
 }
 
 void MorrisPreOrder(NodePtr tree){
-    if(tree == nullptr){
-        return;
-    }
-
     NodePtr cur = tree, pre = nullptr;
     while(cur != nullptr){
         if(cur->left == nullptr){
@@ -129,10 +165,6 @@ void MorrisPreOrder(NodePtr tree){
 }
 
 void MorrisInOrder(NodePtr tree){
-    if(tree == nullptr){
-        return;
-    }
-
     NodePtr cur = tree, pre = nullptr;
     while(cur != nullptr){
         if(cur->left == nullptr){
@@ -198,10 +230,6 @@ void PrintReversely(NodePtr from, NodePtr to){
 }
 
 void MorrisPostOrder(NodePtr tree){
-    if(tree == nullptr){
-        return;
-    }
-
     NodePtr cur = tree, pre = nullptr ;
     NodePtr dummy = new Node(0);
     dummy->left = tree;
@@ -234,7 +262,7 @@ int main(){
     std::cout << "print the data of this node, input 0 as nullptr: " << std::endl;
     tree = CreateTree();
   
-    std::cout << "先序遍历" << std::endl;
+    std::cout << "迭代先序遍历" << std::endl;
     PreOrderRecursive(tree);
     std::cout << std::endl;
 
@@ -242,18 +270,22 @@ int main(){
     InOrder(tree);
     std::cout << std::endl;
 
+    std::cout<< "迭代式中序遍历" << std::endl;
+    InOrderRecursive(tree);
+    std::cout << std::endl;
+     
     std::cout << "Morris InOrder traversal" << std::endl;
     MorrisInOrder(tree);
     std::cout << std::endl;
 
-    std::cout << "后序遍历" << std::endl;
-    PostOrder(tree);
+    std::cout << "迭代后序遍历" << std::endl;
+    PostOrderRecursive(tree);
     std::cout << std::endl;
 
     std::cout << "Morris PostOrder traversal" << std::endl;
     MorrisPostOrder(tree);
     std::cout << std::endl;
-    
+
     std::cout << "删除树的所有节点： ";
     DestroyTree(&tree);
     std::cout << std::endl;
