@@ -1,6 +1,7 @@
 #include <iostream>
 #include <climits>
 #include <stack>
+#include <queue>
 
 typedef struct Node{
     int val;
@@ -13,7 +14,7 @@ typedef struct Node{
 
 }Node, *NodePtr;
 
-
+// Method 1: can get both max or min depth
 void GetTreeDepth(NodePtr tree, int & cur_depth, int &max_depth, int &min_depth){
     if(tree == nullptr){
         return ;
@@ -33,6 +34,7 @@ void GetTreeDepth(NodePtr tree, int & cur_depth, int &max_depth, int &min_depth)
     cur_depth--;
 }
 
+// Method 2, can only get depth 
 int TreeDepth(NodePtr tree){
     if(tree == nullptr){
         return 0;
@@ -59,6 +61,41 @@ void DestroyTree(Node **tree){
    tree = nullptr;
 }
 
+// Method 3: layer traversal
+int TreeDepthByLayerTraversal(NodePtr tree){
+    if( !tree ){
+        return 0;
+    }
+    int depth = 0;
+    int mark_cur = 1;
+    int mark_next = 0;
+    NodePtr ptr = nullptr;
+    std::queue<NodePtr> q;
+    q.push(tree);
+    while(!q.empty()){
+        ptr = q.front();
+        q.pop(); 
+        mark_cur --;
+
+        if(ptr->left){
+            mark_next++;
+            q.push(ptr->left);
+        }
+        if(ptr->right){
+            mark_next++;
+            q.push(ptr->right);
+        }
+
+        if(mark_cur == 0){
+            depth ++;
+            mark_cur = mark_next;
+            mark_next = 0;
+        }
+    }
+
+    return depth;
+}
+
 int main(){
     NodePtr tree = new Node(1);
     tree->left = new Node(8);
@@ -78,6 +115,9 @@ int main(){
     GetTreeDepth(tree, cur_depth, max_depth, min_depth);
     std::cout << "the max depth of tree is: " << max_depth << std::endl;
     std::cout << "the min depth of tree is: " << min_depth << std::endl;
+
+    auto depth = TreeDepthByLayerTraversal(tree);
+    std::cout << "tree depth counted by TreeDepthByLayerTraversal: " << depth << std::endl;
 
     std::cout << "deleting tree" << std::endl;
     DestroyTree(&tree);
