@@ -3,13 +3,13 @@
 template<typename T>
 void F(T t, int idx){
     t[idx] = '*';
-    std::cout << "non-ref response" << std::endl;
+    std::cout << "F with non-ref array called" << std::endl;
 }
 
 template<typename T, std::size_t N>
 void F(T (&t)[N], int idx){
     t[idx] = '*';
-    std::cout << "array ref response, array size: " << N << std::endl;
+    std::cout << "F with ref array called , array size: " << N << std::endl;
 }
 
 int main(){
